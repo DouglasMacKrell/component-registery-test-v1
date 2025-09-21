@@ -1,5 +1,12 @@
 {
   "dependencies": {
-    "@builder.io/react": "^8.2.7"
+    "@builder.io/react": "^8.2.7",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "typescript": "^5.9.2"
   }
 }
