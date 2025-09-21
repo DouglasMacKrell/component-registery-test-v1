@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@builder.io/react": "^8.2.7"
+  }
+}
