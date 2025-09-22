@@ -174,3 +174,8 @@ coverage/
 # Misc
 *.tgz
 *.tar.gz
+
+# env
+.env
+.env.*
+

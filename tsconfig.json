@@ -6,8 +6,11 @@
     "moduleResolution": "Bundler",
     "strict": true,
     "noUncheckedIndexedAccess": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
-    "paths": { "*": ["src/*"] }
+    "paths": { "*": ["src/*"] },
+    "types": ["jest", "node"]
   },
-  "include": ["src"]
+  "include": ["src", "tests"]
 }
