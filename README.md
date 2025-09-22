@@ -1,6 +1,15 @@
 # Component Registry Showcase
 
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-https://component--registry--showcase.onrender.com-blue?style=for-the-badge&logo=vercel)](https://component-registry-showcase.onrender.com)
+[![Deployment Status](https://img.shields.io/badge/Deployment-Render-green?style=for-the-badge&logo=render)](https://render.com)
+
 A modern, type-safe component registry system built with Next.js, React, TypeScript, and Builder.io integration. This project demonstrates how to create a scalable component architecture with automated testing, linting, and pre-commit hooks.
+
+## 🌐 **Live Demo**
+
+**👉 [View Live Application](https://component-registry-showcase.onrender.com)**
+
+Experience the full component registry showcase with interactive search, sorting, and dynamic rendering capabilities.
 
 ## 🚀 Features
 
@@ -148,6 +157,11 @@ const tickets = transformTickets(rawData);
 
 ### Getting Started
 
+#### Option 1: View Live Demo
+**👉 [Try it now at https://component-registry-showcase.onrender.com](https://component-registry-showcase.onrender.com)**
+
+#### Option 2: Run Locally
+
 1. **Clone the repository**
    ```bash
    git clone https://github.com/DouglasMacKrell/component-registry-showcase.git
@@ -268,6 +282,12 @@ This component registry is perfect for:
 
 ## 🚀 Deployment
 
+### 🌐 **Live Deployment**
+
+**Current Status**: ✅ **LIVE** at [https://component-registry-showcase.onrender.com](https://component-registry-showcase.onrender.com)
+
+The application is automatically deployed to Render with continuous deployment enabled. Every push to the `main` branch triggers an automatic deployment.
+
 ### Production Build
 ```bash
 # Build for production
@@ -279,17 +299,23 @@ npm run start
 
 ### Deployment Options
 
-#### Vercel (Recommended)
+#### Render (Current)
+- **Status**: ✅ Live and deployed
+- **URL**: https://component-registry-showcase.onrender.com
+- **Auto-deploy**: Enabled on main branch pushes
+- **Configuration**: Uses `render.yaml` for deployment settings
+
+#### Vercel (Alternative)
 1. Connect your GitHub repository to Vercel
 2. Vercel will automatically detect Next.js and configure build settings
 3. Deploy with zero configuration
 
-#### Netlify
+#### Netlify (Alternative)
 1. Build command: `npm run build`
 2. Publish directory: `.next`
 3. Deploy with continuous integration
 
-#### Docker
+#### Docker (Alternative)
 ```dockerfile
 FROM node:18-alpine
 WORKDIR /app
