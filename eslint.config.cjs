@@ -11,6 +11,14 @@ const compat = new FlatCompat({
 const config = [
   ...compat.extends('next/core-web-vitals'),
   {
+    ignores: [
+      '.next/**',
+      'node_modules/**',
+      'dist/**',
+      'build/**'
+    ],
+  },
+  {
     rules: {
       // Add any custom rules here
     },

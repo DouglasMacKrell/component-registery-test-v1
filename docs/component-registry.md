@@ -40,19 +40,23 @@ type ComponentMap = {
   Hero: ComponentType<HeroBlock["props"]>;
   CardList: ComponentType<CardListBlock["props"]>;
   CTA: ComponentType<CTABlock["props"]>;
+  SearchBar: ComponentType<SearchBarBlock["props"]>;
+  TicketList: ComponentType<TicketListBlock["props"]>;
 };
 
 export const registry: ComponentMap = {
   Hero,
   CardList,
   CTA,
+  SearchBar,
+  TicketList,
 };
 ```
 
 ### Type-Safe Block System
 ```typescript
 // src/types.ts
-type Block = HeroBlock | CardListBlock | CTABlock;
+type Block = HeroBlock | CardListBlock | CTABlock | SearchBarBlock | TicketListBlock;
 
 type HeroBlock = {
   type: "Hero";
@@ -70,6 +74,27 @@ type CardListBlock = {
       price?: number;
       href?: string;
     }>;
+  };
+};
+
+type SearchBarBlock = {
+  type: "SearchBar";
+  props: {
+    value?: string;
+    onChange?: (value: string) => void;
+    placeholder?: string;
+    debounceMs?: number;
+    syncWithUrl?: boolean;
+    urlParam?: string;
+    'aria-label'?: string;
+    id?: string;
+  };
+};
+
+type TicketListBlock = {
+  type: "TicketList";
+  props: {
+    tickets: Ticket[];
   };
 };
 ```
@@ -154,6 +179,40 @@ function isHeroBlock(block: Block): block is HeroBlock {
 - **Rendering**: Use React.memo for expensive components
 - **Memory**: Implement component cleanup for dynamic components
 
+## Recent Improvements
+
+### SearchBar Layout Fix
+The SearchBar component recently received a critical layout improvement:
+
+```typescript
+// Before: inline-block caused layout issues
+<div style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
+
+// After: block display ensures proper full-width behavior
+<div style={{ position: 'relative', display: 'block', width: '100%' }}>
+```
+
+**Why this matters:**
+- `display: 'inline-block'` caused the search bar to behave like an inline element
+- This prevented proper full-width layout in container systems
+- `display: 'block'` ensures the search bar takes full width of its container
+- Enables proper vertical stacking with other form controls
+
+### Layout System Integration
+The SearchBar now works seamlessly with container-based layouts:
+
+```typescript
+// Search section with full-width search bar
+<div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#f0f9ff' }}>
+  <SearchBar onChange={handleSearchChange} placeholder="Search tickets..." />
+</div>
+
+// Sort section below (proper vertical stacking)
+<div style={{ padding: '1rem', backgroundColor: '#fef3c7' }}>
+  <select>...</select>
+</div>
+```
+
 ## Best Practices
 
 1. **Consistent Props Interface**: All components should follow similar patterns
@@ -161,6 +220,7 @@ function isHeroBlock(block: Block): block is HeroBlock {
 3. **Fallback Components**: Provide default components for unknown types
 4. **Testing**: Test both individual components and the registry system
 5. **Documentation**: Document component props and usage patterns
+6. **Layout Considerations**: Use `display: 'block'` for full-width components in container systems
 
 ## Common Pitfalls
 

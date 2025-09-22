@@ -1,27 +1,28 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import TicketList from '../src/components/TicketList';
 import type { Ticket } from '../src/types';
 
 // Mock ticket data for testing
 const mockTickets: Ticket[] = [
-  { id: '1', title: 'Concert Ticket', price: 25.00, currency: 'USD' },
-  { id: '2', title: 'Movie Ticket', price: 12.50, currency: 'USD' },
-  { id: '3', title: 'Theater Show', price: 45.00, currency: 'EUR' },
-  { id: '4', title: 'Sports Event', price: 75.00, currency: 'GBP' },
-  { id: '5', title: 'Comedy Show', price: 20.00, currency: 'USD' },
+  { id: '1', title: 'Olivia Rodrigo Guts Tour', price: 125.00, currency: 'USD' },
+  { id: '2', title: 'Harry Styles Love on Tour', price: 89.50, currency: 'USD' },
+  { id: '3', title: 'Billie Eilish Happier Than Ever', price: 145.00, currency: 'EUR' },
+  { id: '4', title: 'Taylor Swift Eras Tour', price: 275.00, currency: 'GBP' },
+  { id: '5', title: 'Kendrick Lamar Mr. Morale Tour', price: 95.00, currency: 'USD' },
 ];
 
 describe('TicketList', () => {
   test('renders all tickets by default', () => {
     render(<TicketList tickets={mockTickets} />);
     
-    expect(screen.getByText('Concert Ticket')).toBeInTheDocument();
-    expect(screen.getByText('Movie Ticket')).toBeInTheDocument();
-    expect(screen.getByText('Theater Show')).toBeInTheDocument();
-    expect(screen.getByText('Sports Event')).toBeInTheDocument();
-    expect(screen.getByText('Comedy Show')).toBeInTheDocument();
+    expect(screen.getByText('Olivia Rodrigo Guts Tour')).toBeInTheDocument();
+    expect(screen.getByText('Harry Styles Love on Tour')).toBeInTheDocument();
+    expect(screen.getByText('Billie Eilish Happier Than Ever')).toBeInTheDocument();
+    expect(screen.getByText('Taylor Swift Eras Tour')).toBeInTheDocument();
+    expect(screen.getByText('Kendrick Lamar Mr. Morale Tour')).toBeInTheDocument();
   });
 
   test('renders search input with proper accessibility', () => {
@@ -30,8 +31,8 @@ describe('TicketList', () => {
     const searchInput = screen.getByLabelText('Search tickets');
     expect(searchInput).toBeInTheDocument();
     expect(searchInput).toHaveAttribute('type', 'text');
-    expect(searchInput).toHaveAttribute('placeholder', 'Search tickets...');
-    expect(searchInput).toHaveAttribute('id', 'search-tickets');
+    expect(searchInput).toHaveAttribute('placeholder', 'Search tickets by title...');
+    expect(searchInput).toHaveAttribute('id', 'ticket-search');
   });
 
   test('renders sort select with proper accessibility', () => {
@@ -43,31 +44,66 @@ describe('TicketList', () => {
     expect(sortSelect).toHaveAttribute('id', 'sort-tickets');
   });
 
-  test('filters tickets by search term (case-insensitive)', () => {
+  test('filters tickets by search term (case-insensitive)', async () => {
     render(<TicketList tickets={mockTickets} />);
     
     const searchInput = screen.getByLabelText('Search tickets');
     
-    // Search for "concert" (case-insensitive)
-    fireEvent.change(searchInput, { target: { value: 'concert' } });
-    expect(screen.getByText('Concert Ticket')).toBeInTheDocument();
-    expect(screen.queryByText('Movie Ticket')).not.toBeInTheDocument();
+    // Search for "Taylor" (case-insensitive)
+    fireEvent.change(searchInput, { target: { value: 'Taylor' } });
     
-    // Search for "SHOW" (uppercase)
-    fireEvent.change(searchInput, { target: { value: 'SHOW' } });
-    expect(screen.getByText('Theater Show')).toBeInTheDocument();
-    expect(screen.getByText('Comedy Show')).toBeInTheDocument();
-    expect(screen.queryByText('Concert Ticket')).not.toBeInTheDocument();
+    // Wait for debounced search to complete (300ms + buffer)
+    await waitFor(() => {
+      expect(screen.getByText('Taylor Swift Eras Tour')).toBeInTheDocument();
+      expect(screen.queryByText('Harry Styles Love on Tour')).not.toBeInTheDocument();
+    }, { timeout: 1000 });
+    
+    // Search for "TOUR" (uppercase)
+    fireEvent.change(searchInput, { target: { value: 'TOUR' } });
+    
+    await waitFor(() => {
+      expect(screen.getByText('Olivia Rodrigo Guts Tour')).toBeInTheDocument();
+      expect(screen.getByText('Harry Styles Love on Tour')).toBeInTheDocument();
+      expect(screen.getByText('Taylor Swift Eras Tour')).toBeInTheDocument();
+      expect(screen.getByText('Kendrick Lamar Mr. Morale Tour')).toBeInTheDocument();
+      expect(screen.queryByText('Billie Eilish Happier Than Ever')).not.toBeInTheDocument();
+    }, { timeout: 1000 });
   });
 
-  test('shows "No tickets found" when search yields no results', () => {
+  test('shows "No tickets found" when search yields no results', async () => {
     render(<TicketList tickets={mockTickets} />);
     
     const searchInput = screen.getByLabelText('Search tickets');
     fireEvent.change(searchInput, { target: { value: 'nonexistent' } });
     
-    expect(screen.getByText('No tickets found.')).toBeInTheDocument();
-    expect(screen.queryByText('Concert Ticket')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('No tickets found matching "nonexistent"')).toBeInTheDocument();
+      expect(screen.queryByText('Taylor Swift Eras Tour')).not.toBeInTheDocument();
+    }, { timeout: 1000 });
+  });
+
+  test('clears search when clear button is clicked', async () => {
+    render(<TicketList tickets={mockTickets} />);
+    
+    const searchInput = screen.getByLabelText('Search tickets');
+    
+    // Search for something
+    fireEvent.change(searchInput, { target: { value: 'Taylor' } });
+    
+    await waitFor(() => {
+      expect(screen.getByText('Taylor Swift Eras Tour')).toBeInTheDocument();
+      expect(screen.queryByText('Harry Styles Love on Tour')).not.toBeInTheDocument();
+    }, { timeout: 1000 });
+    
+    // Clear the search
+    const clearButton = screen.getByLabelText('Clear search');
+    fireEvent.click(clearButton);
+    
+    await waitFor(() => {
+      expect(searchInput).toHaveValue('');
+      expect(screen.getByText('Taylor Swift Eras Tour')).toBeInTheDocument();
+      expect(screen.getByText('Harry Styles Love on Tour')).toBeInTheDocument();
+    }, { timeout: 1000 });
   });
 
   test('sorts tickets by price ascending (default)', () => {
@@ -77,8 +113,8 @@ describe('TicketList', () => {
     const firstTicket = ticketItems[0];
     const lastTicket = ticketItems[ticketItems.length - 1];
     
-    expect(firstTicket).toHaveTextContent('Movie Ticket');
-    expect(lastTicket).toHaveTextContent('Sports Event');
+    expect(firstTicket).toHaveTextContent('Harry Styles Love on Tour');
+    expect(lastTicket).toHaveTextContent('Taylor Swift Eras Tour');
   });
 
   test('sorts tickets by price descending', () => {
@@ -91,8 +127,8 @@ describe('TicketList', () => {
     const firstTicket = ticketItems[0];
     const lastTicket = ticketItems[ticketItems.length - 1];
     
-    expect(firstTicket).toHaveTextContent('Sports Event');
-    expect(lastTicket).toHaveTextContent('Movie Ticket');
+    expect(firstTicket).toHaveTextContent('Taylor Swift Eras Tour');
+    expect(lastTicket).toHaveTextContent('Harry Styles Love on Tour');
   });
 
   test('sorts tickets by title alphabetically', () => {
@@ -105,88 +141,104 @@ describe('TicketList', () => {
     const firstTicket = ticketItems[0];
     const lastTicket = ticketItems[ticketItems.length - 1];
     
-    expect(firstTicket).toHaveTextContent('Comedy Show');
-    expect(lastTicket).toHaveTextContent('Theater Show');
+    expect(firstTicket).toHaveTextContent('Billie Eilish Happier Than Ever');
+    expect(lastTicket).toHaveTextContent('Taylor Swift Eras Tour');
   });
 
-  test('combines search and sort functionality', () => {
+  test('combines search and sort functionality', async () => {
+    const user = userEvent.setup();
     render(<TicketList tickets={mockTickets} />);
     
-    // Search for tickets containing "show"
+    // Search for tickets containing "tour"
     const searchInput = screen.getByLabelText('Search tickets');
-    fireEvent.change(searchInput, { target: { value: 'show' } });
+    await user.type(searchInput, 'tour');
+    
+    // Wait for the debounce to complete (300ms + buffer)
+    await new Promise(resolve => setTimeout(resolve, 400));
+    
+    // Wait for search to complete
+    await waitFor(() => {
+      expect(screen.getByText('Olivia Rodrigo Guts Tour')).toBeInTheDocument();
+    }, { timeout: 1000 });
     
     // Sort by price descending
     const sortSelect = screen.getByLabelText('Sort tickets');
-    fireEvent.change(sortSelect, { target: { value: 'price-desc' } });
+    await user.selectOptions(sortSelect, 'price-desc');
     
     const ticketItems = screen.getAllByRole('listitem');
-    expect(ticketItems).toHaveLength(2);
+    expect(ticketItems).toHaveLength(4);
     
-    // Theater Show should come first (higher price)
-    expect(ticketItems[0]).toHaveTextContent('Theater Show');
-    expect(ticketItems[1]).toHaveTextContent('Comedy Show');
+    // Taylor Swift should come first (highest price)
+    expect(ticketItems[0]).toHaveTextContent('Taylor Swift Eras Tour');
+    expect(ticketItems[1]).toHaveTextContent('Olivia Rodrigo Guts Tour');
   });
 
   test('renders ticket prices with proper formatting', () => {
     render(<TicketList tickets={mockTickets} />);
     
-    expect(screen.getByText((content, element) => {
-      return element?.textContent === 'Concert Ticket — $25.00';
-    })).toBeInTheDocument();
-    expect(screen.getByText((content, element) => {
-      return element?.textContent === 'Movie Ticket — $12.50';
-    })).toBeInTheDocument();
-    expect(screen.getByText((content, element) => {
-      return element?.textContent === 'Theater Show — €45.00';
-    })).toBeInTheDocument();
-    expect(screen.getByText((content, element) => {
-      return element?.textContent === 'Sports Event — £75.00';
-    })).toBeInTheDocument();
+    // Check that titles and prices are rendered separately
+    expect(screen.getByText('Olivia Rodrigo Guts Tour')).toBeInTheDocument();
+    expect(screen.getByText('$125.00')).toBeInTheDocument();
+    expect(screen.getByText('Harry Styles Love on Tour')).toBeInTheDocument();
+    expect(screen.getByText('$89.50')).toBeInTheDocument();
+    expect(screen.getByText('Billie Eilish Happier Than Ever')).toBeInTheDocument();
+    expect(screen.getByText('€145.00')).toBeInTheDocument();
+    expect(screen.getByText('Taylor Swift Eras Tour')).toBeInTheDocument();
+    expect(screen.getByText('£275.00')).toBeInTheDocument();
   });
 
   test('handles empty tickets array', () => {
     render(<TicketList tickets={[]} />);
     
-    expect(screen.getByText('No tickets found.')).toBeInTheDocument();
+    expect(screen.getByText('No tickets available')).toBeInTheDocument();
     expect(screen.queryByRole('listitem')).not.toBeInTheDocument();
   });
 
-  test('maintains search state when sorting changes', () => {
+  test('maintains search state when sorting changes', async () => {
+    const user = userEvent.setup();
     render(<TicketList tickets={mockTickets} />);
     
     const searchInput = screen.getByLabelText('Search tickets');
-    fireEvent.change(searchInput, { target: { value: 'ticket' } });
+    await user.type(searchInput, 'tour');
+    
+    // Wait for the debounce to complete (300ms + buffer)
+    await new Promise(resolve => setTimeout(resolve, 400));
+    
+    await waitFor(() => {
+      expect(screen.getByText('Olivia Rodrigo Guts Tour')).toBeInTheDocument();
+    }, { timeout: 1000 });
     
     const sortSelect = screen.getByLabelText('Sort tickets');
-    fireEvent.change(sortSelect, { target: { value: 'title-asc' } });
+    await user.selectOptions(sortSelect, 'title-asc');
     
-    // Search term should still be "ticket"
-    expect(searchInput).toHaveValue('ticket');
+    // Search term should still be "tour"
+    expect(searchInput).toHaveValue('tour');
     
     // Should still show filtered results
-    expect(screen.getByText('Concert Ticket')).toBeInTheDocument();
-    expect(screen.getByText('Movie Ticket')).toBeInTheDocument();
-    expect(screen.queryByText('Theater Show')).not.toBeInTheDocument();
+    expect(screen.getByText('Harry Styles Love on Tour')).toBeInTheDocument();
+    expect(screen.getByText('Taylor Swift Eras Tour')).toBeInTheDocument();
+    expect(screen.queryByText('Billie Eilish Happier Than Ever')).not.toBeInTheDocument();
   });
 
-  test('maintains sort state when search changes', () => {
+  test('maintains sort state when search changes', async () => {
     render(<TicketList tickets={mockTickets} />);
     
     const sortSelect = screen.getByLabelText('Sort tickets');
     fireEvent.change(sortSelect, { target: { value: 'title-asc' } });
     
     const searchInput = screen.getByLabelText('Search tickets');
-    fireEvent.change(searchInput, { target: { value: 'show' } });
+    fireEvent.change(searchInput, { target: { value: 'tour' } });
     
-    // Sort should still be "title-asc"
-    expect(sortSelect).toHaveValue('title-asc');
-    
-    // Results should be filtered and sorted
-    const ticketItems = screen.getAllByRole('listitem');
-    expect(ticketItems).toHaveLength(2);
-    expect(ticketItems[0]).toHaveTextContent('Comedy Show');
-    expect(ticketItems[1]).toHaveTextContent('Theater Show');
+    await waitFor(() => {
+      // Sort should still be "title-asc"
+      expect(sortSelect).toHaveValue('title-asc');
+      
+      // Results should be filtered and sorted
+      const ticketItems = screen.getAllByRole('listitem');
+      expect(ticketItems).toHaveLength(4);
+      expect(ticketItems[0]).toHaveTextContent('Harry Styles Love on Tour');
+      expect(ticketItems[1]).toHaveTextContent('Kendrick Lamar Mr. Morale Tour');
+    }, { timeout: 1000 });
   });
 
   test('renders proper list structure', () => {
@@ -207,12 +259,10 @@ describe('TicketList', () => {
     
     render(<TicketList tickets={ticketsWithZeroPrice} />);
     
-    expect(screen.getByText((content, element) => {
-      return element?.textContent === 'Free Event — $0.00';
-    })).toBeInTheDocument();
-    expect(screen.getByText((content, element) => {
-      return element?.textContent === 'Paid Event — $25.00';
-    })).toBeInTheDocument();
+    expect(screen.getByText('Free Event')).toBeInTheDocument();
+    expect(screen.getByText('$0.00')).toBeInTheDocument();
+    expect(screen.getByText('Paid Event')).toBeInTheDocument();
+    expect(screen.getByText('$25.00')).toBeInTheDocument();
   });
 
   test('handles tickets with decimal prices', () => {
@@ -223,11 +273,9 @@ describe('TicketList', () => {
     
     render(<TicketList tickets={ticketsWithDecimals} />);
     
-    expect(screen.getByText((content, element) => {
-      return element?.textContent === 'Event 1 — $12.34';
-    })).toBeInTheDocument();
-    expect(screen.getByText((content, element) => {
-      return element?.textContent === 'Event 2 — €99.99';
-    })).toBeInTheDocument();
+    expect(screen.getByText('Event 1')).toBeInTheDocument();
+    expect(screen.getByText('$12.34')).toBeInTheDocument();
+    expect(screen.getByText('Event 2')).toBeInTheDocument();
+    expect(screen.getByText('€99.99')).toBeInTheDocument();
   });
 });

@@ -19,7 +19,26 @@ export type CTABlock = {
   props: { label: string; href: string; variant?: "primary" | "secondary" };
 };
 
-export type Block = HeroBlock | CardListBlock | CTABlock;
+export type SearchBarBlock = {
+  type: "SearchBar";
+  props: { 
+    value?: string;
+    onChange?: (value: string) => void;
+    placeholder?: string;
+    debounceMs?: number;
+    syncWithUrl?: boolean;
+    urlParam?: string;
+    'aria-label'?: string;
+    id?: string;
+  };
+};
+
+export type TicketListBlock = {
+  type: "TicketList";
+  props: { tickets: Ticket[] };
+};
+
+export type Block = HeroBlock | CardListBlock | CTABlock | SearchBarBlock | TicketListBlock;
 
 export type PageDoc = {
   pageTitle?: string;

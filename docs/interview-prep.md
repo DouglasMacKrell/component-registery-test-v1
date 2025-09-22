@@ -36,6 +36,7 @@
 - **User interactions**: Search, filtering, and sorting
 - **Accessibility**: ARIA labels and semantic HTML
 - **Performance**: Memoization and optimization
+- **Layout systems**: CSS display properties and container behavior
 
 ## Common Interview Questions
 
@@ -204,6 +205,34 @@ function renderWithABTest(block: Block, userId: string) {
 4. **Use React DevTools**: Inspect component tree and props
 5. **Add logging**: Log component rendering and props
 6. **Test in isolation**: Render component directly
+
+#### Q: "A search component isn't taking full width in its container. How would you debug this?"
+**A:** This is likely a CSS display property issue. Here's the debugging approach:
+
+```typescript
+// Problem: inline-block prevents full-width behavior
+<div style={{ display: 'inline-block', width: '100%' }}>
+  <input style={{ width: '100%' }} />
+</div>
+
+// Solution: Use block display for proper container behavior
+<div style={{ display: 'block', width: '100%' }}>
+  <input style={{ width: '100%' }} />
+</div>
+```
+
+**Debugging steps:**
+1. Check the container's `display` property
+2. Verify `width: '100%'` is set
+3. Ensure no conflicting CSS rules
+4. Test with browser dev tools
+5. Consider flexbox or grid for complex layouts
+
+**Why this happens:**
+- `inline-block` elements behave like inline elements
+- They don't take full width of their container
+- `block` elements naturally take full width
+- Container systems expect block-level behavior
 
 #### Q: "How would you handle component versioning and backward compatibility?"
 **A:**

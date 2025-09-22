@@ -8,7 +8,8 @@ A modern, type-safe component registry system built with Next.js, React, TypeScr
 - **Builder.io Integration** - Ready for visual page building and content management
 - **Modern Development Stack** - Next.js 15, React 19, TypeScript 5.9
 - **Automated Quality Gates** - ESLint, Jest testing, and pre-commit hooks
-- **Component Showcase** - Live examples of Hero, CardList, CTA, and TicketList components
+- **Component Showcase** - Live examples of Hero, CardList, CTA, TicketList, and SearchBar components
+- **Advanced Search Component** - Debounced SearchBar with URL sync and accessibility features
 - **Data Transformation Utilities** - Robust ticket data processing with comprehensive validation
 - **Testing Suite** - Comprehensive test coverage with React Testing Library
 
@@ -21,12 +22,14 @@ export const registry = {
   Hero,
   CardList,
   CTA,
+  SearchBar,
+  TicketList,
 };
 ```
 
 ### Type-Safe Block System
 ```typescript
-type Block = HeroBlock | CardListBlock | CTABlock;
+type Block = HeroBlock | CardListBlock | CTABlock | SearchBarBlock | TicketListBlock;
 ```
 
 ### Dynamic Rendering
@@ -71,6 +74,42 @@ const tickets = transformTickets(rawData);
   - Performance optimized with memoized filtering and sorting
   - Responsive design with clean styling
   - Empty state handling
+
+### SearchBar Component
+- **Purpose**: Reusable search input with advanced features
+- **Props**: `value`, `onChange`, `placeholder`, `debounceMs`, `syncWithUrl`, `urlParam`, `aria-label`, `id`
+- **Features**:
+  - **Debounced Input**: Configurable delay (default 300ms) to prevent excessive API calls
+  - **URL Synchronization**: Automatically syncs search terms with URL parameters
+  - **Accessibility**: Full ARIA support, proper label associations, keyboard navigation
+  - **Clear Functionality**: Built-in clear button with hover states
+  - **Focus Management**: Visual focus indicators and proper tab order
+  - **SSR Compatible**: Handles server-side rendering gracefully
+  - **Customizable**: Flexible styling and behavior options
+  - **Performance**: Optimized with useCallback and proper event handling
+  - **Layout Integration**: Uses `display: 'block'` for proper full-width container behavior
+
+#### SearchBar Usage Example
+```typescript
+import SearchBar from './components/SearchBar';
+
+function MyComponent() {
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  return (
+    <SearchBar
+      value={searchTerm}
+      onChange={setSearchTerm}
+      placeholder="Search items..."
+      debounceMs={300}
+      syncWithUrl={true}
+      urlParam="search"
+      aria-label="Search for items"
+      id="item-search"
+    />
+  );
+}
+```
 
 ## 🔧 Data Transformation Utilities
 
@@ -197,13 +236,15 @@ npm run lint -- --fix
 │   │   ├── Hero.tsx
 │   │   ├── CardList.tsx
 │   │   ├── CTA.tsx
+│   │   ├── SearchBar.tsx
 │   │   └── TicketList.tsx
 │   ├── lib/                 # Utility functions
 │   │   └── transformTickets.ts
 │   ├── registry.ts          # Component registry
 │   ├── renderBlocks.tsx     # Dynamic rendering
 │   ├── types.ts            # TypeScript definitions
-│   └── mockPage.ts         # Sample data
+│   ├── mockPage.ts         # Sample data
+│   └── mockEvents.ts       # Sample event data
 ├── tests/                   # Test files
 ├── .husky/                  # Git hooks
 ├── eslint.config.cjs        # ESLint configuration
@@ -224,6 +265,50 @@ This component registry is perfect for:
 - **Ticket/Event Systems** - Interactive ticket listings with search and sorting
 - **E-commerce Platforms** - Product catalogs with filtering and sorting
 - **Event Management** - Ticket sales and event listings
+
+## 🚀 Deployment
+
+### Production Build
+```bash
+# Build for production
+npm run build
+
+# Start production server
+npm run start
+```
+
+### Deployment Options
+
+#### Vercel (Recommended)
+1. Connect your GitHub repository to Vercel
+2. Vercel will automatically detect Next.js and configure build settings
+3. Deploy with zero configuration
+
+#### Netlify
+1. Build command: `npm run build`
+2. Publish directory: `.next`
+3. Deploy with continuous integration
+
+#### Docker
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+### Environment Variables
+No environment variables required for basic functionality.
+
+### Performance Optimizations
+- **Static Generation**: Pages are pre-rendered at build time
+- **Code Splitting**: Automatic code splitting with Next.js
+- **Image Optimization**: Built-in Next.js image optimization
+- **Bundle Analysis**: Use `npm run build` to analyze bundle size
 
 ## 🔗 Integration
 
