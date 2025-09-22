@@ -2,9 +2,21 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { renderBlocks } from '../src/renderBlocks';
 
-jest.mock('../src/components/Hero', () => () => <div>HeroOK</div>);
-jest.mock('../src/components/CardList', () => (props: any) => <div>CardListOK:{props.items?.length ?? 0}</div>);
-jest.mock('../src/components/CTA', () => () => <a>CTAOK</a>);
+jest.mock('../src/components/Hero', () => {
+  const MockHero = () => <div>HeroOK</div>;
+  MockHero.displayName = 'MockHero';
+  return MockHero;
+});
+jest.mock('../src/components/CardList', () => {
+  const MockCardList = (props: any) => <div>CardListOK:{props.items?.length ?? 0}</div>;
+  MockCardList.displayName = 'MockCardList';
+  return MockCardList;
+});
+jest.mock('../src/components/CTA', () => {
+  const MockCTA = () => <a>CTAOK</a>;
+  MockCTA.displayName = 'MockCTA';
+  return MockCTA;
+});
 
 test('renders registered blocks and handles unknown types', () => {
   render(
