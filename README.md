@@ -64,9 +64,11 @@ const tickets = transformTickets(rawData);
 - **Purpose**: Interactive ticket listing with search and sorting
 - **Props**: `tickets[]` with `id`, `title`, `price`, `currency`
 - **Features**: 
-  - Real-time search (case-insensitive)
+  - Real-time search (case-insensitive, performance optimized)
   - Multiple sort options (price ascending/descending, title alphabetical)
-  - Accessible form controls with proper ARIA labels
+  - Proper currency formatting with Intl.NumberFormat (USD: $25.00, EUR: €45.00, GBP: £75.00)
+  - Accessible form controls with proper label associations
+  - Performance optimized with memoized filtering and sorting
   - Responsive design with clean styling
   - Empty state handling
 

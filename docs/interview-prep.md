@@ -244,49 +244,71 @@ class ContentUpdateService {
 #### Q: "How would you implement an interactive component with search and sorting?"
 **A:**
 ```typescript
-// Interactive component with TypeScript
+// Interview-ready interactive component with TypeScript
 type SortOption = 'price-asc' | 'price-desc' | 'title-asc';
+
+// Sort comparators map for O(1) dispatch
+const sortComparators = {
+  'price-asc': (a: Ticket, b: Ticket) => a.price - b.price,
+  'price-desc': (a: Ticket, b: Ticket) => b.price - a.price,
+  'title-asc': (a: Ticket, b: Ticket) => a.title.localeCompare(b.title),
+} as const;
+
+// Currency formatter with proper internationalization
+const formatPrice = (price: number, currency: string) => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: currency,
+  }).format(price);
+};
 
 export default function TicketList({ tickets }: { tickets: Ticket[] }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [sort, setSort] = useState<SortOption>('price-asc');
 
   const filteredAndSortedTickets = useMemo(() => {
-    const filtered = tickets.filter(ticket =>
-      ticket.title.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Compute search term once for performance
+    const normalizedSearchTerm = searchTerm.toLowerCase();
+    
+    // Filter by search term (case-insensitive contains on title)
+    const filtered = normalizedSearchTerm
+      ? tickets.filter(ticket =>
+          ticket.title.toLowerCase().includes(normalizedSearchTerm)
+        )
+      : tickets;
 
-    return filtered.sort((a, b) => {
-      switch (sort) {
-        case 'price-asc': return a.price - b.price;
-        case 'price-desc': return b.price - a.price;
-        case 'title-asc': return a.title.localeCompare(b.title);
-        default: return 0;
-      }
-    });
+    // Sort the filtered results (copy before sort for safety)
+    return [...filtered].sort(sortComparators[sort]);
   }, [tickets, searchTerm, sort]);
 
   return (
     <div>
-      <input
-        type="text"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        aria-label="Search tickets"
-      />
-      <select
-        value={sort}
-        onChange={(e) => setSort(e.target.value as SortOption)}
-        aria-label="Sort tickets"
-      >
-        <option value="price-asc">Price: Low to High</option>
-        <option value="price-desc">Price: High to Low</option>
-        <option value="title-asc">Title: A to Z</option>
-      </select>
+      <div>
+        <label htmlFor="search-tickets">Search tickets</label>
+        <input
+          id="search-tickets"
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search tickets..."
+        />
+      </div>
+      <div>
+        <label htmlFor="sort-tickets">Sort tickets</label>
+        <select
+          id="sort-tickets"
+          value={sort}
+          onChange={(e) => setSort(e.target.value as SortOption)}
+        >
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="title-asc">Title: A to Z</option>
+        </select>
+      </div>
       <ul>
         {filteredAndSortedTickets.map(ticket => (
           <li key={ticket.id}>
-            <strong>{ticket.title}</strong> — ${ticket.price.toFixed(2)} {ticket.currency}
+            <strong>{ticket.title}</strong> — {formatPrice(ticket.price, ticket.currency)}
           </li>
         ))}
       </ul>

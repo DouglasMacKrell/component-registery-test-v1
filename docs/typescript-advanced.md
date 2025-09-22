@@ -400,23 +400,38 @@ type ComplexProps = {
 // src/components/TicketList.tsx
 type SortOption = 'price-asc' | 'price-desc' | 'title-asc';
 
+// Sort comparators map for O(1) dispatch
+const sortComparators = {
+  'price-asc': (a: Ticket, b: Ticket) => a.price - b.price,
+  'price-desc': (a: Ticket, b: Ticket) => b.price - a.price,
+  'title-asc': (a: Ticket, b: Ticket) => a.title.localeCompare(b.title),
+} as const;
+
+// Currency formatter
+const formatPrice = (price: number, currency: string) => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: currency,
+  }).format(price);
+};
+
 export default function TicketList({ tickets }: { tickets: Ticket[] }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [sort, setSort] = useState<SortOption>('price-asc');
 
   const filteredAndSortedTickets = useMemo(() => {
-    const filtered = tickets.filter(ticket =>
-      ticket.title.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Compute search term once for performance
+    const normalizedSearchTerm = searchTerm.toLowerCase();
+    
+    // Filter by search term (case-insensitive contains on title)
+    const filtered = normalizedSearchTerm
+      ? tickets.filter(ticket =>
+          ticket.title.toLowerCase().includes(normalizedSearchTerm)
+        )
+      : tickets;
 
-    return filtered.sort((a, b) => {
-      switch (sort) {
-        case 'price-asc': return a.price - b.price;
-        case 'price-desc': return b.price - a.price;
-        case 'title-asc': return a.title.localeCompare(b.title);
-        default: return 0;
-      }
-    });
+    // Sort the filtered results (copy before sort for safety)
+    return [...filtered].sort(sortComparators[sort]);
   }, [tickets, searchTerm, sort]);
 }
 ```
@@ -435,21 +450,27 @@ const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 
 ### 3. **Accessibility with TypeScript**
 ```typescript
-// Type-safe accessibility props
-type AccessibilityProps = {
-  'aria-label': string;
-  'aria-describedby'?: string;
-  role?: string;
-};
-
+// Type-safe accessibility with proper label associations
 const searchInput = (
-  <input
-    type="text"
-    value={searchTerm}
-    onChange={handleSearchChange}
-    aria-label="Search tickets"
-    placeholder="Search tickets..."
-  />
+  <div>
+    <label htmlFor="search-tickets" style={{ display: 'block', marginBottom: '0.25rem' }}>
+      Search tickets
+    </label>
+    <input
+      id="search-tickets"
+      type="text"
+      value={searchTerm}
+      onChange={handleSearchChange}
+      placeholder="Search tickets..."
+    />
+  </div>
+);
+
+// Currency formatting with proper internationalization
+const ticketDisplay = (
+  <li>
+    <strong>{ticket.title}</strong> — {formatPrice(ticket.price, ticket.currency)}
+  </li>
 );
 ```
 
