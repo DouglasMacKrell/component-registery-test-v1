@@ -53,6 +53,24 @@ type CardListBlock = {
 };
 ```
 
+### Data Transformation Types
+```typescript
+// src/types.ts
+type RawTicket = {
+  id: unknown;
+  title: unknown;
+  price_cents: unknown;
+  currency: unknown;
+};
+
+type Ticket = {
+  id: string;
+  title: string;
+  price: number;
+  currency: 'USD' | 'EUR' | 'GBP';
+};
+```
+
 ### Discriminated Unions
 ```typescript
 // TypeScript knows which props belong to which component
@@ -120,7 +138,47 @@ type Readonly<T> = {
 };
 ```
 
-### 5. **Utility Types**
+### 5. **Data Transformation Patterns**
+```typescript
+// Type-safe data transformation with validation
+function transformTickets(input: unknown): Ticket[] {
+  if (!Array.isArray(input)) {
+    return [];
+  }
+  
+  return input
+    .filter((item): item is RawTicket => 
+      typeof item === 'object' && 
+      item !== null && 
+      'id' in item && 
+      item.id !== null && 
+      item.id !== undefined
+    )
+    .map((item): Ticket => ({
+      id: String(item.id),
+      title: normalizeTitle(item.title),
+      price: normalizePrice(item.price_cents),
+      currency: normalizeCurrency(item.currency),
+    }));
+}
+
+// Helper functions with type guards
+function normalizeTitle(title: unknown): string {
+  if (typeof title !== 'string' || title.trim() === '') {
+    return 'Untitled';
+  }
+  return title;
+}
+
+function normalizeCurrency(currency: unknown): 'USD' | 'EUR' | 'GBP' {
+  if (currency === 'USD' || currency === 'EUR' || currency === 'GBP') {
+    return currency;
+  }
+  return 'USD';
+}
+```
+
+### 6. **Utility Types**
 ```typescript
 // Pick specific properties
 type HeroTitle = Pick<HeroBlock['props'], 'title'>; // { title: string }

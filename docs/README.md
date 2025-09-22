@@ -29,6 +29,7 @@ Welcome to the comprehensive documentation for the Component Registry Showcase p
 - **TypeScript 5.9 Features** - Strict type checking, modern module resolution
 - **Our Implementation** - Type-safe component registry, discriminated unions
 - **Advanced Patterns** - Generic types, conditional types, template literals
+- **Data Transformation** - Type-safe validation and normalization patterns
 - **Performance Considerations** - Type-only imports, avoiding complex types
 - **Best Practices** - Strict mode, type guards, utility types
 
@@ -42,6 +43,7 @@ Welcome to the comprehensive documentation for the Component Registry Showcase p
 ### 6. [Interview Preparation Guide](./interview-prep.md)
 - **Key Concepts** - What to master for interviews
 - **Common Questions** - Technical, architecture, and problem-solving questions
+- **Data Transformation** - Type-safe validation and normalization patterns
 - **Demo Scenarios** - Live coding challenges and architecture discussions
 - **Key Points** - What to emphasize in interviews
 - **Questions to Ask** - What to ask the interviewer
@@ -84,6 +86,7 @@ Welcome to the comprehensive documentation for the Component Registry Showcase p
 - Generic types
 - Utility types
 - Type guards
+- Data transformation patterns
 - Advanced patterns
 
 ### Next.js
@@ -106,6 +109,13 @@ Welcome to the comprehensive documentation for the Component Registry Showcase p
 - Scalability considerations
 - Team collaboration
 - Best practices
+
+### Data Transformation
+- Type-safe validation
+- Data normalization
+- Error handling
+- Functional patterns
+- Testing strategies
 
 ## 🚀 Getting Started
 

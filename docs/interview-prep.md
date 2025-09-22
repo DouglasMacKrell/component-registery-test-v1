@@ -25,6 +25,12 @@
 - **Content Modeling**: Structured content types
 - **Multi-channel**: Content across platforms
 
+### 5. **Data Transformation**
+- **Type-safe validation**: Runtime type checking with TypeScript
+- **Data normalization**: Consistent data formats
+- **Error handling**: Graceful handling of invalid data
+- **Functional patterns**: Pure functions and immutability
+
 ## Common Interview Questions
 
 ### Technical Questions
@@ -78,6 +84,45 @@ const MemoizedHero = React.memo(Hero);
 // 3. Virtual scrolling for large lists
 // 4. Code splitting by component type
 // 5. Caching rendered components
+```
+
+#### Q: "How would you handle data transformation and validation?"
+**A:**
+```typescript
+// 1. Type-safe data transformation
+function transformTickets(input: unknown): Ticket[] {
+  if (!Array.isArray(input)) {
+    return [];
+  }
+  
+  return input
+    .filter((item): item is RawTicket => 
+      typeof item === 'object' && 
+      item !== null && 
+      'id' in item && 
+      item.id !== null
+    )
+    .map((item): Ticket => ({
+      id: String(item.id),
+      title: normalizeTitle(item.title),
+      price: normalizePrice(item.price_cents),
+      currency: normalizeCurrency(item.currency),
+    }));
+}
+
+// 2. Helper functions with type guards
+function normalizeTitle(title: unknown): string {
+  if (typeof title !== 'string' || title.trim() === '') {
+    return 'Untitled';
+  }
+  return title;
+}
+
+// 3. Comprehensive testing
+test('handles invalid data gracefully', () => {
+  const result = transformTickets([{ id: null, title: '', price_cents: 'invalid' }]);
+  expect(result).toEqual([]);
+});
 ```
 
 ### Architecture Questions

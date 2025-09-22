@@ -9,6 +9,7 @@ A modern, type-safe component registry system built with Next.js, React, TypeScr
 - **Modern Development Stack** - Next.js 15, React 19, TypeScript 5.9
 - **Automated Quality Gates** - ESLint, Jest testing, and pre-commit hooks
 - **Component Showcase** - Live examples of Hero, CardList, and CTA components
+- **Data Transformation Utilities** - Robust ticket data processing with comprehensive validation
 - **Testing Suite** - Comprehensive test coverage with React Testing Library
 
 ## 🏗️ Architecture
@@ -34,6 +35,14 @@ type Block = HeroBlock | CardListBlock | CTABlock;
 {renderBlocks(page.blocks)}
 ```
 
+### Data Transformation Utilities
+```typescript
+// Transform raw ticket data with validation and normalization
+import { transformTickets } from 'src/lib/transformTickets';
+
+const tickets = transformTickets(rawData);
+```
+
 ## 📦 Components
 
 ### Hero Component
@@ -50,6 +59,35 @@ type Block = HeroBlock | CardListBlock | CTABlock;
 - **Purpose**: Call-to-action buttons
 - **Props**: `label`, `href`, `variant` (primary/secondary)
 - **Features**: Accessible, customizable styling
+
+## 🔧 Data Transformation Utilities
+
+### transformTickets Function
+- **Purpose**: Transform and validate raw ticket data
+- **Input**: Unknown data (arrays of RawTicket objects)
+- **Output**: Normalized Ticket objects
+- **Features**: 
+  - Type-safe validation and transformation
+  - Handles missing/invalid data gracefully
+  - Filters out invalid entries
+  - Converts price_cents to dollars
+  - Normalizes currency codes (USD/EUR/GBP)
+
+### Usage Example
+```typescript
+import { transformTickets } from 'src/lib/transformTickets';
+
+const rawData = [
+  { id: 1, title: 'Concert', price_cents: 1234, currency: 'USD' },
+  { id: 2, title: null, price_cents: 2000, currency: 'CAD' }
+];
+
+const tickets = transformTickets(rawData);
+// Result: [
+//   { id: '1', title: 'Concert', price: 12.34, currency: 'USD' },
+//   { id: '2', title: 'Untitled', price: 20.00, currency: 'USD' }
+// ]
+```
 
 ## 🛠️ Development
 
@@ -114,9 +152,10 @@ npm test -- --coverage
 ### Test Structure
 ```
 tests/
-├── App.test.tsx          # Main app integration tests
-├── smoke.test.tsx        # Basic smoke tests
-└── renderBlocks.test.tsx # Component registry tests
+├── Page.test.tsx              # Main app integration tests
+├── smoke.test.tsx             # Basic smoke tests
+├── renderBlocks.test.tsx      # Component registry tests
+└── transformTickets.test.ts   # Data transformation tests
 ```
 
 ## 🔧 Code Quality
@@ -145,13 +184,15 @@ npm run lint -- --fix
 │   │   ├── Hero.tsx
 │   │   ├── CardList.tsx
 │   │   └── CTA.tsx
+│   ├── lib/                 # Utility functions
+│   │   └── transformTickets.ts
 │   ├── registry.ts          # Component registry
 │   ├── renderBlocks.tsx     # Dynamic rendering
 │   ├── types.ts            # TypeScript definitions
 │   └── mockPage.ts         # Sample data
 ├── tests/                   # Test files
 ├── .husky/                  # Git hooks
-├── eslint.config.js         # ESLint configuration
+├── eslint.config.cjs        # ESLint configuration
 ├── jest.config.ts          # Jest configuration
 └── tsconfig.json           # TypeScript configuration
 ```
@@ -165,6 +206,8 @@ This component registry is perfect for:
 - **E-commerce** - Product listings and CTAs
 - **Marketing Sites** - Hero sections and call-to-actions
 - **Documentation Sites** - Component showcases
+- **Data Processing Applications** - Robust data transformation and validation
+- **Ticket/Event Systems** - Normalized ticket data processing
 
 ## 🔗 Integration
 
