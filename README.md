@@ -150,8 +150,8 @@ const tickets = transformTickets(rawData);
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/DouglasMacKrell/component-registery-test-v1.git
-   cd component-registery-test-v1
+   git clone https://github.com/DouglasMacKrell/component-registry-showcase.git
+   cd component-registry-showcase
    ```
 
 2. **Install dependencies**
