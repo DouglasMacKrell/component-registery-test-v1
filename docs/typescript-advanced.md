@@ -393,6 +393,66 @@ type ComplexProps = {
 5. **Document Complex Types**: Add JSDoc comments for complex types
 6. **Use Branded Types**: For distinct primitive types
 
+## Interactive Component Patterns
+
+### 1. **State Management with TypeScript**
+```typescript
+// src/components/TicketList.tsx
+type SortOption = 'price-asc' | 'price-desc' | 'title-asc';
+
+export default function TicketList({ tickets }: { tickets: Ticket[] }) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sort, setSort] = useState<SortOption>('price-asc');
+
+  const filteredAndSortedTickets = useMemo(() => {
+    const filtered = tickets.filter(ticket =>
+      ticket.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    return filtered.sort((a, b) => {
+      switch (sort) {
+        case 'price-asc': return a.price - b.price;
+        case 'price-desc': return b.price - a.price;
+        case 'title-asc': return a.title.localeCompare(b.title);
+        default: return 0;
+      }
+    });
+  }, [tickets, searchTerm, sort]);
+}
+```
+
+### 2. **Event Handler Typing**
+```typescript
+// Properly typed event handlers
+const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  setSearchTerm(e.target.value);
+};
+
+const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  setSort(e.target.value as SortOption);
+};
+```
+
+### 3. **Accessibility with TypeScript**
+```typescript
+// Type-safe accessibility props
+type AccessibilityProps = {
+  'aria-label': string;
+  'aria-describedby'?: string;
+  role?: string;
+};
+
+const searchInput = (
+  <input
+    type="text"
+    value={searchTerm}
+    onChange={handleSearchChange}
+    aria-label="Search tickets"
+    placeholder="Search tickets..."
+  />
+);
+```
+
 ## Common Pitfalls
 
 1. **Over-typing**: Don't create types for everything
@@ -400,3 +460,5 @@ type ComplexProps = {
 3. **Complex Generics**: Keep generics simple and readable
 4. **Runtime vs Compile-time**: Remember TypeScript types are erased at runtime
 5. **Type Assertions**: Use sparingly and with caution
+6. **Event Handler Types**: Always type React event handlers properly
+7. **State Type Inference**: Let TypeScript infer simple state types when possible

@@ -31,6 +31,12 @@
 - **Error handling**: Graceful handling of invalid data
 - **Functional patterns**: Pure functions and immutability
 
+### 6. **Interactive Components**
+- **State management**: React hooks with TypeScript
+- **User interactions**: Search, filtering, and sorting
+- **Accessibility**: ARIA labels and semantic HTML
+- **Performance**: Memoization and optimization
+
 ## Common Interview Questions
 
 ### Technical Questions
@@ -235,6 +241,60 @@ class ContentUpdateService {
 }
 ```
 
+#### Q: "How would you implement an interactive component with search and sorting?"
+**A:**
+```typescript
+// Interactive component with TypeScript
+type SortOption = 'price-asc' | 'price-desc' | 'title-asc';
+
+export default function TicketList({ tickets }: { tickets: Ticket[] }) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sort, setSort] = useState<SortOption>('price-asc');
+
+  const filteredAndSortedTickets = useMemo(() => {
+    const filtered = tickets.filter(ticket =>
+      ticket.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    return filtered.sort((a, b) => {
+      switch (sort) {
+        case 'price-asc': return a.price - b.price;
+        case 'price-desc': return b.price - a.price;
+        case 'title-asc': return a.title.localeCompare(b.title);
+        default: return 0;
+      }
+    });
+  }, [tickets, searchTerm, sort]);
+
+  return (
+    <div>
+      <input
+        type="text"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        aria-label="Search tickets"
+      />
+      <select
+        value={sort}
+        onChange={(e) => setSort(e.target.value as SortOption)}
+        aria-label="Sort tickets"
+      >
+        <option value="price-asc">Price: Low to High</option>
+        <option value="price-desc">Price: High to Low</option>
+        <option value="title-asc">Title: A to Z</option>
+      </select>
+      <ul>
+        {filteredAndSortedTickets.map(ticket => (
+          <li key={ticket.id}>
+            <strong>{ticket.title}</strong> — ${ticket.price.toFixed(2)} {ticket.currency}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
 ## Demo Scenarios
 
 ### 1. **Live Coding Challenge**
@@ -243,6 +303,8 @@ Be prepared to:
 - Add it to the registry
 - Update the types
 - Write a test for it
+- Implement interactive features (search, sorting)
+- Handle accessibility requirements
 
 ### 2. **Architecture Discussion**
 Be ready to discuss:
@@ -257,6 +319,9 @@ Common scenarios:
 - Type errors in registry
 - Performance issues
 - Integration problems
+- Interactive component state management
+- Accessibility compliance
+- Search and filtering performance
 
 ## Key Points to Emphasize
 

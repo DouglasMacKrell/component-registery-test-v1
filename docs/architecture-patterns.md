@@ -11,6 +11,7 @@ export const registry = {
   Hero,
   CardList,
   CTA,
+  TicketList,
 };
 
 // Dynamic component lookup
@@ -219,6 +220,101 @@ test('renders components correctly', () => {
   
   expect(screen.getByText('Mock Hero')).toBeInTheDocument();
   expect(screen.getByText('Mock CardList')).toBeInTheDocument();
+});
+```
+
+## Interactive Component Patterns
+
+### 1. **State Management Pattern**
+```typescript
+// Interactive component with controlled state
+type SortOption = 'price-asc' | 'price-desc' | 'title-asc';
+
+export default function TicketList({ tickets }: { tickets: Ticket[] }) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sort, setSort] = useState<SortOption>('price-asc');
+
+  // Derived state with memoization
+  const filteredAndSortedTickets = useMemo(() => {
+    const filtered = tickets.filter(ticket =>
+      ticket.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    return filtered.sort((a, b) => {
+      switch (sort) {
+        case 'price-asc': return a.price - b.price;
+        case 'price-desc': return b.price - a.price;
+        case 'title-asc': return a.title.localeCompare(b.title);
+        default: return 0;
+      }
+    });
+  }, [tickets, searchTerm, sort]);
+
+  return (
+    <div>
+      <input
+        type="text"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        aria-label="Search tickets"
+      />
+      <select
+        value={sort}
+        onChange={(e) => setSort(e.target.value as SortOption)}
+        aria-label="Sort tickets"
+      >
+        <option value="price-asc">Price: Low to High</option>
+        <option value="price-desc">Price: High to Low</option>
+        <option value="title-asc">Title: A to Z</option>
+      </select>
+      <ul>
+        {filteredAndSortedTickets.map(ticket => (
+          <li key={ticket.id}>
+            <strong>{ticket.title}</strong> — ${ticket.price.toFixed(2)} {ticket.currency}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+### 2. **Accessibility Pattern**
+```typescript
+// Consistent accessibility implementation
+type AccessibilityProps = {
+  'aria-label': string;
+  'aria-describedby'?: string;
+  role?: string;
+};
+
+const createAccessibleInput = (
+  type: string,
+  value: string,
+  onChange: (value: string) => void,
+  label: string
+) => (
+  <input
+    type={type}
+    value={value}
+    onChange={(e) => onChange(e.target.value)}
+    aria-label={label}
+    placeholder={label}
+  />
+);
+```
+
+### 3. **Performance Optimization Pattern**
+```typescript
+// Memoization for expensive operations
+const ExpensiveComponent = React.memo(({ data, filter, sort }: Props) => {
+  const processedData = useMemo(() => {
+    return data
+      .filter(item => item.title.includes(filter))
+      .sort((a, b) => a[sort] - b[sort]);
+  }, [data, filter, sort]);
+
+  return <div>{/* render processed data */}</div>;
 });
 ```
 

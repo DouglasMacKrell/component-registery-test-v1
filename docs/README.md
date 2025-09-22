@@ -117,6 +117,13 @@ Welcome to the comprehensive documentation for the Component Registry Showcase p
 - Functional patterns
 - Testing strategies
 
+### Interactive Components
+- Search functionality
+- Sorting capabilities
+- Accessibility features
+- State management
+- User experience patterns
+
 ## 🚀 Getting Started
 
 1. **Read the README** - Understand the project overview

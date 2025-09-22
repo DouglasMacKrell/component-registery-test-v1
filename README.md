@@ -8,7 +8,7 @@ A modern, type-safe component registry system built with Next.js, React, TypeScr
 - **Builder.io Integration** - Ready for visual page building and content management
 - **Modern Development Stack** - Next.js 15, React 19, TypeScript 5.9
 - **Automated Quality Gates** - ESLint, Jest testing, and pre-commit hooks
-- **Component Showcase** - Live examples of Hero, CardList, and CTA components
+- **Component Showcase** - Live examples of Hero, CardList, CTA, and TicketList components
 - **Data Transformation Utilities** - Robust ticket data processing with comprehensive validation
 - **Testing Suite** - Comprehensive test coverage with React Testing Library
 
@@ -59,6 +59,16 @@ const tickets = transformTickets(rawData);
 - **Purpose**: Call-to-action buttons
 - **Props**: `label`, `href`, `variant` (primary/secondary)
 - **Features**: Accessible, customizable styling
+
+### TicketList Component
+- **Purpose**: Interactive ticket listing with search and sorting
+- **Props**: `tickets[]` with `id`, `title`, `price`, `currency`
+- **Features**: 
+  - Real-time search (case-insensitive)
+  - Multiple sort options (price ascending/descending, title alphabetical)
+  - Accessible form controls with proper ARIA labels
+  - Responsive design with clean styling
+  - Empty state handling
 
 ## 🔧 Data Transformation Utilities
 
@@ -155,7 +165,8 @@ tests/
 ├── Page.test.tsx              # Main app integration tests
 ├── smoke.test.tsx             # Basic smoke tests
 ├── renderBlocks.test.tsx      # Component registry tests
-└── transformTickets.test.ts   # Data transformation tests
+├── transformTickets.test.ts   # Data transformation tests
+└── TicketList.test.tsx        # Interactive component tests
 ```
 
 ## 🔧 Code Quality
@@ -183,7 +194,8 @@ npm run lint -- --fix
 │   ├── components/          # Reusable components
 │   │   ├── Hero.tsx
 │   │   ├── CardList.tsx
-│   │   └── CTA.tsx
+│   │   ├── CTA.tsx
+│   │   └── TicketList.tsx
 │   ├── lib/                 # Utility functions
 │   │   └── transformTickets.ts
 │   ├── registry.ts          # Component registry
@@ -207,7 +219,9 @@ This component registry is perfect for:
 - **Marketing Sites** - Hero sections and call-to-actions
 - **Documentation Sites** - Component showcases
 - **Data Processing Applications** - Robust data transformation and validation
-- **Ticket/Event Systems** - Normalized ticket data processing
+- **Ticket/Event Systems** - Interactive ticket listings with search and sorting
+- **E-commerce Platforms** - Product catalogs with filtering and sorting
+- **Event Management** - Ticket sales and event listings
 
 ## 🔗 Integration
 
