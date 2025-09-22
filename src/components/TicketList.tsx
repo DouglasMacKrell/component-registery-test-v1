@@ -63,7 +63,7 @@ export default function TicketList({ tickets }: Props) {
           borderRadius: '8px',
           border: '2px solid #0ea5e9'
         }}>
-          <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem', color: '#0369a1' }}>🔍 Search Events - UPDATED {new Date().toLocaleTimeString()}</h3>
+          <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem', color: '#0369a1' }}>🔍 Search Events</h3>
           <SearchBar
             onChange={handleSearchChange}
             placeholder="Search tickets by title..."
